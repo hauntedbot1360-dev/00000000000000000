@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BNCT_1360</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #0a0c0f;
+  --panel:     #0f1318;
+  --border:    #1a2030;
+  --accent:    #00d4ff;
+  --accent2:   #ff3860;
+  --accent3:   #00ff88;
+  --warn:      #ffb300;
+  --text:      #c8d6e5;
+  --text-dim:  #4a5568;
+  --glow:      0 0 20px rgba(0,212,255,0.3);
+  --glow2:     0 0 20px rgba(255,56,96,0.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
+}
+
+/* ══════════ HOME PAGE ══════════ */
+#home-screen {
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:90;
+}
+
+#secret-zone {
+  position:fixed;top:0;left:0;right:0;height:80px;
+  z-index:95;cursor:default;
+  background:transparent;
+}
+
+.home-header {
+  text-align:center;margin-bottom:48px;
+  animation:fadeIn .6s ease forwards;
+}
+.home-header h1 {
+  font-family:'Share Tech Mono';font-size:36px;
+  color:var(--accent);letter-spacing:6px;
+}
+.home-header p {
+  color:var(--text-dim);font-size:14px;letter-spacing:3px;margin-top:8px;
+}
+
+.home-stats-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+  max-width:600px;width:90%;
+  animation:fadeIn .8s ease forwards;
+}
+
+.home-stat-card {
+  background:var(--panel);border:1px solid var(--border);
+  padding:28px 24px;position:relative;overflow:hidden;
+  transition:.3s;text-align:center;
+}
+.home-stat-card:hover{border-color:var(--accent);box-shadow:var(--glow);}
+.home-stat-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+}
+.home-stat-card.red::after{background:linear-gradient(90deg,var(--accent2),transparent);}
+.home-stat-card.green::after{background:linear-gradient(90deg,var(--accent3),transparent);}
+.home-stat-card.warn::after{background:linear-gradient(90deg,var(--warn),transparent);}
+
+.home-stat-card .home-icon {font-size:32px;margin-bottom:12px;}
+.home-stat-card .home-label {font-size:12px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;}
+.home-stat-card .home-value {
+  font-family:'Share Tech Mono';font-size:42px;
+  color:var(--accent);margin:8px 0 4px;
+  text-shadow:0 0 20px rgba(0,212,255,0.5);
+}
+.home-stat-card.red .home-value{color:var(--accent2);text-shadow:0 0 20px rgba(255,56,96,0.5);}
+.home-stat-card.green .home-value{color:var(--accent3);text-shadow:0 0 20px rgba(0,255,136,0.5);}
+.home-stat-card.warn .home-value{color:var(--warn);text-shadow:0 0 20px rgba(255,179,0,0.5);}
+.home-stat-card .home-sub {font-size:12px;color:var(--text-dim);}
+
+/* cached badge */
+.cached-badge {
+  position:absolute;top:6px;right:8px;
+  font-family:'Share Tech Mono';font-size:9px;
+  color:var(--warn);letter-spacing:1px;opacity:.7;
+}
+
+.bot-status-pill {
+  display:inline-block;padding:4px 14px;border-radius:2px;
+  font-family:'Share Tech Mono';font-size:20px;font-weight:bold;
+  margin-top:4px;
+}
+.bot-on-pill {color:var(--accent3);border:1px solid var(--accent3);background:rgba(0,255,136,0.08);}
+.bot-off-pill{color:var(--accent2);border:1px solid var(--accent2);background:rgba(255,56,96,0.08);}
+
+.home-footer {
+  margin-top:40px;text-align:center;
+  font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);
+  letter-spacing:2px;animation:fadeIn 1s ease forwards;
+}
+
+#secret-counter-display {
+  position:fixed;top:10px;left:50%;transform:translateX(-50%);
+  font-family:'Share Tech Mono';font-size:10px;color:transparent;
+  letter-spacing:4px;z-index:300;pointer-events:none;
+  transition:.3s;
+}
+
+/* ── LOGIN ── */
+#login-screen{
+  position:fixed;inset:0;background:var(--bg);display:none;
+  align-items:center;justify-content:center;z-index:100;
+}
+#login-screen.active{display:flex;}
+.login-box{
+  background:var(--panel);border:1px solid var(--accent);
+  padding:48px 40px;width:380px;position:relative;
+  box-shadow:var(--glow);
+}
+.login-box::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo span{font-family:'Share Tech Mono';font-size:28px;color:var(--accent);letter-spacing:4px;}
+.login-logo p{color:var(--text-dim);font-size:13px;margin-top:6px;letter-spacing:2px;}
+.login-input{
+  width:100%;background:rgba(0,212,255,0.05);border:1px solid var(--border);
+  color:var(--text);padding:14px 16px;font-family:'Rajdhani';font-size:16px;
+  letter-spacing:2px;margin-bottom:16px;outline:none;transition:.2s;
+  -webkit-user-select:text;user-select:text;
+}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 10px rgba(0,212,255,0.2);}
+.login-btn{
+  width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);
+  padding:14px;font-family:'Rajdhani';font-size:18px;font-weight:700;letter-spacing:4px;
+  cursor:pointer;transition:.3s;text-transform:uppercase;
+}
+.login-btn:hover{background:var(--accent);color:var(--bg);box-shadow:var(--glow);}
+.login-error{color:var(--accent2);text-align:center;font-size:14px;margin-top:12px;display:none;}
+.lock-icon{text-align:center;font-size:48px;margin-bottom:16px;}
+.attempts-bar{margin-top:12px;text-align:center;font-size:12px;color:var(--text-dim);font-family:'Share Tech Mono';}
+.back-btn{
+  width:100%;background:transparent;border:1px solid var(--border);color:var(--text-dim);
+  padding:10px;font-family:'Rajdhani';font-size:14px;cursor:pointer;
+  letter-spacing:2px;margin-top:8px;transition:.2s;
+}
+.back-btn:hover{border-color:var(--text-dim);color:var(--text);}
+
+/* paste hint */
+.paste-hint {
+  font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim);
+  text-align:right;margin-top:-12px;margin-bottom:12px;letter-spacing:1px;
+}
+
+/* ── DASHBOARD ── */
+#dashboard{display:none;position:relative;z-index:91;}
+.topbar{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:0 24px;display:flex;align-items:center;justify-content:space-between;
+  height:60px;position:sticky;top:0;z-index:50;
+}
+.topbar-logo{font-family:'Share Tech Mono';color:var(--accent);font-size:20px;letter-spacing:3px;}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent3);box-shadow:0 0 8px var(--accent3);animation:pulse 2s infinite;}
+.logout-btn{background:transparent;border:1px solid var(--accent2);color:var(--accent2);padding:6px 16px;font-family:'Rajdhani';font-size:14px;cursor:pointer;letter-spacing:2px;transition:.2s;}
+.logout-btn:hover{background:var(--accent2);color:var(--bg);}
+
+.main{padding:24px;max-width:1400px;margin:0 auto;}
+
+/* ── STATS GRID ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+.stat-card{
+  background:var(--panel);border:1px solid var(--border);padding:20px;
+  position:relative;overflow:hidden;transition:.2s;
+}
+.stat-card:hover{border-color:var(--accent);box-shadow:var(--glow);}
+.stat-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent);
+}
+.stat-label{font-size:12px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;}
+.stat-value{font-family:'Share Tech Mono';font-size:36px;color:var(--accent);margin:8px 0 4px;}
+.stat-sub{font-size:12px;color:var(--text-dim);}
+.stat-card.red .stat-value{color:var(--accent2);}
+.stat-card.red::after{background:linear-gradient(90deg,var(--accent2),transparent);}
+.stat-card.green .stat-value{color:var(--accent3);}
+.stat-card.green::after{background:linear-gradient(90deg,var(--accent3),transparent);}
+.stat-card.warn .stat-value{color:var(--warn);}
+.stat-card.warn::after{background:linear-gradient(90deg,var(--warn),transparent);}
+
+/* ── PANELS ── */
+.panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+@media(max-width:900px){.panels-grid{grid-template-columns:1fr;}}
+
+.panel{background:var(--panel);border:1px solid var(--border);overflow:hidden;}
+.panel-header{
+  padding:12px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.panel-title{font-size:13px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;font-family:'Share Tech Mono';}
+.panel-body{padding:20px;}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:14px;}
+.data-table th{
+  text-align:left;padding:8px 12px;font-size:11px;letter-spacing:2px;
+  color:var(--text-dim);border-bottom:1px solid var(--border);
+}
+.data-table td{padding:10px 12px;border-bottom:1px solid rgba(26,32,48,0.5);}
+.data-table tr:hover td{background:rgba(0,212,255,0.03);}
+.badge{
+  display:inline-block;padding:2px 10px;font-size:11px;letter-spacing:1px;
+  font-family:'Share Tech Mono';
+}
+.badge-active{background:rgba(0,255,136,0.1);color:var(--accent3);border:1px solid var(--accent3);}
+.badge-inactive{background:rgba(255,56,96,0.1);color:var(--accent2);border:1px solid var(--accent2);}
+.badge-vip{background:rgba(255,179,0,0.1);color:var(--warn);border:1px solid var(--warn);}
+.badge-blocked{background:rgba(255,56,96,0.1);color:var(--accent2);border:1px solid var(--accent2);}
+
+/* ── USER SEARCH ── */
+.search-box{display:flex;gap:8px;margin-bottom:16px;}
+.search-input{
+  flex:1;background:rgba(0,212,255,0.05);border:1px solid var(--border);
+  color:var(--text);padding:10px 14px;font-family:'Rajdhani';font-size:16px;outline:none;
+}
+.search-input:focus{border-color:var(--accent);}
+
+/* ── BOT CONTROL ── */
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.control-btn{
+  padding:14px;font-family:'Rajdhani';font-size:16px;font-weight:700;
+  letter-spacing:2px;cursor:pointer;transition:.3s;border:1px solid;text-transform:uppercase;
+  background:transparent;
+}
+.control-btn.bot-on{border-color:var(--accent3);color:var(--accent3);}
+.control-btn.bot-on:hover{background:var(--accent3);color:var(--bg);}
+.control-btn.bot-off{border-color:var(--accent2);color:var(--accent2);}
+.control-btn.bot-off:hover{background:var(--accent2);color:var(--bg);}
+.control-btn.broadcast{border-color:var(--accent);color:var(--accent);grid-column:1/-1;}
+.control-btn.broadcast:hover{background:var(--accent);color:var(--bg);}
+
+/* ── LOG ── */
+.log-entry{
+  padding:10px 14px;margin-bottom:4px;border-left:3px solid;
+  font-family:'Share Tech Mono';font-size:12px;background:rgba(255,255,255,0.02);
+}
+.log-entry.ok{border-color:var(--accent3);}
+.log-entry.warn{border-color:var(--warn);}
+.log-entry.danger{border-color:var(--accent2);}
+.log-entry.critical{border-color:#ff0040;background:rgba(255,0,64,0.05);}
+.log-time{color:var(--text-dim);margin-right:12px;}
+.log-scroll{max-height:300px;overflow-y:auto;}
+.log-scroll::-webkit-scrollbar{width:4px;}
+.log-scroll::-webkit-scrollbar-track{background:var(--bg);}
+.log-scroll::-webkit-scrollbar-thumb{background:var(--accent);}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:24px;right:24px;padding:14px 24px;
+  font-family:'Share Tech Mono';font-size:14px;z-index:600;
+  transform:translateY(100px);transition:.3s;opacity:0;
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.success{background:var(--accent3);color:var(--bg);}
+#toast.error{background:var(--accent2);color:#fff;}
+#toast.info{background:var(--accent);color:var(--bg);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;
+  display:none;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--panel);border:1px solid var(--accent);padding:32px;
+  width:480px;max-width:90vw;box-shadow:var(--glow);
+}
+.modal h3{color:var(--accent);font-family:'Share Tech Mono';letter-spacing:2px;margin-bottom:20px;}
+.modal textarea,.modal input[type=text]{
+  width:100%;background:rgba(0,212,255,0.05);border:1px solid var(--border);
+  color:var(--text);padding:12px;font-family:'Rajdhani';font-size:16px;
+  outline:none;margin-bottom:12px;resize:vertical;
+}
+.modal textarea:focus,.modal input[type=text]:focus{border-color:var(--accent);}
+.modal-btns{display:flex;gap:12px;justify-content:flex-end;}
+
+.btn{
+  padding:8px 20px;font-family:'Rajdhani';font-size:15px;font-weight:600;
+  letter-spacing:2px;cursor:pointer;transition:.2s;border:none;
+}
+.btn-primary{background:var(--accent);color:var(--bg);}
+.btn-primary:hover{box-shadow:var(--glow);transform:translateY(-1px);}
+.btn-danger{background:transparent;border:1px solid var(--accent2);color:var(--accent2);}
+.btn-danger:hover{background:var(--accent2);color:var(--bg);}
+.btn-success{background:transparent;border:1px solid var(--accent3);color:var(--accent3);}
+.btn-success:hover{background:var(--accent3);color:var(--bg);}
+.btn-warn{background:transparent;border:1px solid var(--warn);color:var(--warn);}
+.btn-warn:hover{background:var(--warn);color:var(--bg);}
+
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeIn .4s ease forwards;}
+
+.section-title{
+  font-family:'Share Tech Mono';color:var(--text-dim);font-size:11px;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+.full-panel{margin-bottom:24px;}
+.refresh-btn{
+  background:transparent;border:1px solid var(--border);color:var(--text-dim);
+  padding:4px 12px;font-size:12px;cursor:pointer;font-family:'Share Tech Mono';
+  transition:.2s;
+}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+.threat-0{color:var(--accent3);}
+.threat-1{color:var(--warn);}
+.threat-2{color:var(--accent2);}
+.threat-3{color:#ff0040;font-weight:bold;}
+
+.empty-state{text-align:center;padding:40px;color:var(--text-dim);font-family:'Share Tech Mono';font-size:13px;}
+
+@keyframes scan {
+  0%{top:0%;}100%{top:100%;}
+}
+.scan-line {
+  position:fixed;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(0,212,255,0.15),transparent);
+  animation:scan 4s linear infinite;
+  pointer-events:none;z-index:95;
+}
+
+@keyframes blink {0%,100%{opacity:1;}50%{opacity:0;}}
+.live-dot {
+  display:inline-block;width:8px;height:8px;border-radius:50%;
+  background:var(--accent3);margin-right:6px;
+  animation:blink 1.5s ease infinite;
+}
+
+/* ── WEBSITE API PANEL ── */
+.website-api-box {
+  background: rgba(0,212,255,0.04);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 0;
+}
+.website-api-key-display {
+  font-family: 'Share Tech Mono';
+  font-size: 13px;
+  color: var(--accent3);
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--accent3);
+  padding: 12px 16px;
+  letter-spacing: 1px;
+  word-break: break-all;
+  margin: 12px 0;
+  cursor: pointer;
+  transition: .2s;
+}
+.website-api-key-display:hover {
+  background: rgba(0,255,136,0.08);
+}
+.api-endpoint-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+}
+.api-method {
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.api-method.get { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid var(--accent); }
+.api-method.post { background: rgba(0,255,136,0.1); color: var(--accent3); border: 1px solid var(--accent3); }
+.api-endpoint-url { color: var(--text); flex: 1; }
+.api-endpoint-desc { color: var(--text-dim); font-size: 10px; }
+.copy-btn-small {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  font-family: 'Share Tech Mono';
+  font-size: 10px;
+  cursor: pointer;
+  transition: .2s;
+  white-space: nowrap;
+}
+.copy-btn-small:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ══════════ USER FILE CARDS ══════════ */
+#user-files-section {
+  margin-top: 32px;
+}
+
+.user-files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  padding: 8px 0;
+}
+
+/* FILE FOLDER CARD */
+.user-file-card {
+  position: relative;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  user-select: none;
+}
+.user-file-card:hover {
+  transform: translateY(-4px);
+}
+.user-file-card:hover .file-folder-body {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* Folder shape */
+.file-folder-top {
+  height: 14px;
+  width: 60%;
+  border-radius: 6px 6px 0 0;
+  margin-left: 8px;
+  position: relative;
+}
+.file-folder-body {
+  border-radius: 0 6px 6px 6px;
+  padding: 16px 12px 12px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: box-shadow .2s;
+  position: relative;
+  overflow: hidden;
+}
+.file-folder-body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Color themes per role */
+.file-normal .file-folder-top    { background: #1a3a5c; }
+.file-normal .file-folder-body   { background: #0f2540; border: 1px solid #1e4a7a; }
+.file-normal .file-name          { color: #5ab4ff; }
+.file-normal .file-uid-tag       { color: #3a7fbf; }
+
+.file-vip .file-folder-top    { background: #5a3e00; }
+.file-vip .file-folder-body   { background: #2a1d00; border: 1px solid #c9860a; box-shadow: 0 0 12px rgba(201,134,10,0.15); }
+.file-vip .file-name          { color: #ffb300; text-shadow: 0 0 10px rgba(255,179,0,0.4); }
+.file-vip .file-uid-tag       { color: #9a6800; }
+.file-vip .file-folder-body::after {
+  content: '👑';
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 14px;
+  opacity: .8;
+}
+
+.file-blocked .file-folder-top  { background: #3d0a0a; }
+.file-blocked .file-folder-body { background: #1a0404; border: 1px solid #7a1a1a; }
+.file-blocked .file-name        { color: #ff5c5c; }
+.file-blocked .file-uid-tag     { color: #7a2a2a; }
+.file-blocked .file-folder-body::after {
+  content: '🚫';
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 14px;
+  opacity: .7;
+}
+
+.file-admin .file-folder-top    { background: #1a0a3d; }
+.file-admin .file-folder-body   { background: #0d0520; border: 1px solid #7c3aed; box-shadow: 0 0 12px rgba(124,58,237,0.15); }
+.file-admin .file-name          { color: #c084fc; text-shadow: 0 0 8px rgba(192,132,252,0.4); }
+.file-admin .file-uid-tag       { color: #5b21b6; }
+.file-admin .file-folder-body::after {
+  content: '⚡';
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 14px;
+}
+
+/* File card content */
+.file-name {
+  font-family: 'Share Tech Mono';
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  word-break: break-all;
+  margin-bottom: 6px;
+}
+.file-uid-tag {
+  font-family: 'Share Tech Mono';
+  font-size: 10px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.file-stats-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.file-stat-row {
+  font-family: 'Share Tech Mono';
+  font-size: 10px;
+  color: var(--text-dim);
+  display: flex;
+  justify-content: space-between;
+}
+.file-stat-row span:last-child {
+  color: var(--text);
+}
+.file-last-seen {
+  font-family: 'Share Tech Mono';
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  letter-spacing: .5px;
+}
+
+/* File badge (NEW indicator) */
+.file-new-dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent3);
+  box-shadow: 0 0 6px var(--accent3);
+  animation: pulse 1.5s infinite;
+  z-index: 2;
+}
+
+/* ── USER FILE DETAIL MODAL ── */
+#modal-user-file .modal {
+  width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#modal-user-file .modal::-webkit-scrollbar { width: 4px; }
+#modal-user-file .modal::-webkit-scrollbar-thumb { background: var(--accent); }
+
+.ufile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.ufile-avatar {
+  width: 56px; height: 56px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.ufile-avatar.vip    { background: rgba(255,179,0,0.12); border: 1px solid #c9860a; }
+.ufile-avatar.normal { background: rgba(0,212,255,0.08); border: 1px solid #1e4a7a; }
+.ufile-avatar.blocked{ background: rgba(255,56,96,0.08); border: 1px solid #7a1a1a; }
+.ufile-avatar.admin  { background: rgba(124,58,237,0.1); border: 1px solid #7c3aed; }
+
+.ufile-meta h2 {
+  font-family: 'Share Tech Mono';
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.ufile-meta .ufile-badges {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+
+.ufile-progress-section {
+  margin-bottom: 20px;
+}
+.ufile-progress-label {
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.ufile-progress-bar-wrap {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  height: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.ufile-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--warn), #ff6b00);
+  transition: width .5s ease;
+  position: relative;
+}
+.ufile-progress-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+@keyframes shimmer { 0%{transform:translateX(-100%);} 100%{transform:translateX(200%);} }
+.ufile-progress-text {
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  text-align: right;
+}
+
+.ufile-history-title {
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ufile-history-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.history-day-card {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  font-family: 'Share Tech Mono';
+  font-size: 12px;
+}
+.history-day-card.vip-day { border-left-color: var(--warn); }
+.history-date-row {
+  color: var(--accent);
+  font-size: 13px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+.history-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.history-stat-item {
+  text-align: center;
+  padding: 6px;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid rgba(0,212,255,0.08);
+}
+.history-stat-item .hsi-val {
+  color: var(--accent3);
+  font-size: 18px;
+  display: block;
+}
+.history-stat-item .hsi-label {
+  color: var(--text-dim);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.no-history-state {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono';
+  font-size: 12px;
+}
+
+/* File count home badge */
+.home-file-count-note {
+  font-family: 'Share Tech Mono';
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-top: 4px;
+  opacity: .7;
+}
+
+/* Upload/receive endpoint indicator */
+.sync-endpoint-note {
+  background: rgba(0,255,136,0.04);
+  border: 1px solid rgba(0,255,136,0.15);
+  border-left: 3px solid var(--accent3);
+  padding: 10px 14px;
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+  color: var(--accent3);
+  letter-spacing: 1px;
+  margin-top: 12px;
+}
+
+/* files search bar */
+.files-search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+.files-search-input {
+  flex: 1;
+  background: rgba(0,212,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 14px;
+  font-family: 'Share Tech Mono';
+  font-size: 13px;
+  outline: none;
+}
+.files-search-input:focus { border-color: var(--accent); }
+.files-filter-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  font-family: 'Share Tech Mono';
+  font-size: 11px;
+  cursor: pointer;
+  transition: .2s;
+  letter-spacing: 1px;
+}
+.files-filter-btn:hover, .files-filter-btn.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.files-filter-btn.vip-filter.active { border-color: var(--warn); color: var(--warn); }
+.files-filter-btn.blocked-filter.active { border-color: var(--accent2); color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<div class="scan-line"></div>
+<div id="secret-zone" onclick="handleSecretTap()"></div>
+<div id="secret-counter-display">●●●</div>
+
+<!-- ══════════════ HOME PAGE ══════════════ -->
+<div id="home-screen">
+  <div class="home-header">
+    <h1>⚡ BNCT_1360</h1>
+    <p>BOT CONTROL SYSTEM · LIVE STATUS</p>
+  </div>
+
+  <div class="home-stats-grid">
+    <!-- Total Users -->
+    <div class="home-stat-card">
+      <div class="home-icon">👥</div>
+      <div class="home-label">মোট ইউজার</div>
+      <div class="home-value" id="h-total">--</div>
+      <div class="home-sub">Registered Users</div>
+      <div class="cached-badge" id="h-total-cache" style="display:none;">CACHED</div>
+    </div>
+
+    <!-- VIP -->
+    <div class="home-stat-card green">
+      <div class="home-icon">👑</div>
+      <div class="home-label">VIP সংখ্যা</div>
+      <div class="home-value" id="h-vip">--</div>
+      <div class="home-sub">Premium Members</div>
+      <div class="cached-badge" id="h-vip-cache" style="display:none;">CACHED</div>
+    </div>
+
+    <!-- Blocked -->
+    <div class="home-stat-card red">
+      <div class="home-icon">🚫</div>
+      <div class="home-label">ব্লক</div>
+      <div class="home-value" id="h-blocked">--</div>
+      <div class="home-sub">Blocked Users</div>
+      <div class="cached-badge" id="h-blocked-cache" style="display:none;">CACHED</div>
+    </div>
+
+    <!-- Bot Status -->
+    <div class="home-stat-card warn">
+      <div class="home-icon">🤖</div>
+      <div class="home-label">বট স্ট্যাটাস</div>
+      <div id="h-bot-status" class="bot-status-pill bot-off-pill">--</div>
+      <div class="home-sub" style="margin-top:8px;">Bot On / Off</div>
+    </div>
+  </div>
+
+  <div class="home-footer">
+    <span class="live-dot"></span>LIVE DATA · AUTO REFRESH 7s
+  </div>
+</div>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login-screen">
+  <div class="login-box fade-in">
+    <div class="lock-icon">🔐</div>
+    <div class="login-logo">
+      <span>BNCT_1360</span>
+      <p>ADMIN CONTROL PANEL</p>
+    </div>
+    <input class="login-input" type="password" id="pwd-input" placeholder="ENTER PASSWORD" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+    <input class="login-input" type="text" id="api-input" placeholder="API KEY (BNCT-XXXX-...)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="handlePaste(event,'api-input')">
+    <div class="paste-hint">Ctrl+V / Long press to paste ↑</div>
+    <input class="login-input" type="text" id="bot-api" placeholder="BOT API BASE URL (https://...)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onpaste="handlePaste(event,'bot-api')">
+    <div class="paste-hint">Ctrl+V / Long press to paste ↑</div>
+    <button class="login-btn" onclick="doLogin()">⚡ ACCESS</button>
+    <button class="back-btn" onclick="goBackHome()">← BACK TO HOME</button>
+    <div class="login-error" id="login-err">❌ ACCESS DENIED</div>
+    <div class="attempts-bar" id="attempts-bar"></div>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-logo">⚡ BNCT_1360 ADMIN</div>
+    <div class="topbar-right">
+      <span style="font-family:'Share Tech Mono';font-size:12px;color:var(--text-dim);" id="last-refresh"></span>
+      <span class="status-dot"></span>
+      <span style="font-size:13px;color:var(--accent3);">LIVE</span>
+      <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="section-title">📊 LIVE STATISTICS</div>
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value" id="s-total">--</div><div class="stat-sub">Registered</div></div>
+      <div class="stat-card green"><div class="stat-label">VIP Users</div><div class="stat-value" id="s-vip">--</div><div class="stat-sub">Premium</div></div>
+      <div class="stat-card red"><div class="stat-label">Blocked</div><div class="stat-value" id="s-blocked">--</div><div class="stat-sub">Restricted</div></div>
+      <div class="stat-card warn"><div class="stat-label">API Requests</div><div class="stat-value" id="s-api">--</div><div class="stat-sub">Total calls</div></div>
+      <div class="stat-card"><div class="stat-label">Bot Status</div><div class="stat-value" id="s-status" style="font-size:24px;">--</div><div class="stat-sub">Current state</div></div>
+      <div class="stat-card green"><div class="stat-label">API Status</div><div class="stat-value" id="s-api-status" style="font-size:24px;">--</div><div class="stat-sub">Connection</div></div>
+    </div>
+
+    <div class="panels-grid">
+      <!-- BOT CONTROL -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🎮 BOT CONTROL</span>
+          <button class="refresh-btn" onclick="loadStats()">↻ REFRESH</button>
+        </div>
+        <div class="panel-body">
+          <div class="control-grid">
+            <button class="control-btn bot-on" onclick="botControl('on')">🟢 BOT ON</button>
+            <button class="control-btn bot-off" onclick="botControl('off')">🔴 BOT OFF</button>
+            <button class="control-btn broadcast" onclick="openBroadcast()">📢 BROADCAST MESSAGE</button>
+          </div>
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <button class="btn btn-warn" onclick="openAddVIP()" style="width:100%;padding:10px;">👑 ADD VIP</button>
+            <button class="btn btn-danger" onclick="openRemoveVIP()" style="width:100%;padding:10px;">❌ REMOVE VIP</button>
+            <button class="btn btn-danger" onclick="openBlockUser()" style="width:100%;padding:10px;">🚫 BLOCK USER</button>
+            <button class="btn btn-success" onclick="openUnblockUser()" style="width:100%;padding:10px;">✅ UNBLOCK</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER LOOKUP -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🔍 USER LOOKUP</span>
+        </div>
+        <div class="panel-body">
+          <div class="search-box">
+            <input class="search-input" id="uid-input" type="text" placeholder="Enter Telegram User ID...">
+            <button class="btn btn-primary" onclick="lookupUser()">SEARCH</button>
+          </div>
+          <div id="user-result"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ WEBSITE API PANEL ══ -->
+    <div class="full-panel panel" style="margin-bottom:24px;">
+      <div class="panel-header">
+        <span class="panel-title">🌐 WEBSITE API</span>
+        <div style="display:flex;gap:8px;">
+          <button class="refresh-btn" onclick="regenerateWebsiteKey()">🔄 REGENERATE</button>
+          <button class="btn btn-primary" style="padding:4px 14px;font-size:12px;" onclick="openModal('modal-bot-inject')">🤖 BOT এ পাঠাও</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="website-api-box">
+          <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);letter-spacing:2px;margin-bottom:8px;">
+            ℹ️ এই API KEY দিয়ে বট থেকে ওয়েবসাইটের সব সেভ ডেটা অ্যাক্সেস করা যাবে
+          </div>
+          
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);">WEBSITE API KEY:</span>
+            <button class="copy-btn-small" onclick="copyWebsiteKey()">📋 COPY</button>
+          </div>
+          <div class="website-api-key-display" id="website-api-key" onclick="copyWebsiteKey()">
+            Loading...
+          </div>
+
+          <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);letter-spacing:2px;margin:16px 0 8px;">
+            📡 AVAILABLE ENDPOINTS:
+          </div>
+
+          <div class="api-endpoint-row">
+            <span class="api-method get">GET</span>
+            <span class="api-endpoint-url" id="ep-stats">/api/website/stats</span>
+            <span class="api-endpoint-desc">→ সব স্ট্যাটস</span>
+            <button class="copy-btn-small" onclick="copyEndpoint('ep-stats')">COPY</button>
+          </div>
+          <div class="api-endpoint-row">
+            <span class="api-method get">GET</span>
+            <span class="api-endpoint-url" id="ep-users">/api/website/users</span>
+            <span class="api-endpoint-desc">→ ইউজার লিস্ট</span>
+            <button class="copy-btn-small" onclick="copyEndpoint('ep-users')">COPY</button>
+          </div>
+          <div class="api-endpoint-row">
+            <span class="api-method get">GET</span>
+            <span class="api-endpoint-url" id="ep-vip">/api/website/vip-list</span>
+            <span class="api-endpoint-desc">→ VIP লিস্ট</span>
+            <button class="copy-btn-small" onclick="copyEndpoint('ep-vip')">COPY</button>
+          </div>
+          <div class="api-endpoint-row">
+            <span class="api-method post">POST</span>
+            <span class="api-endpoint-url" id="ep-sync">/api/website/sync</span>
+            <span class="api-endpoint-desc">→ বটে ডেটা সিঙ্ক</span>
+            <button class="copy-btn-small" onclick="copyEndpoint('ep-sync')">COPY</button>
+          </div>
+
+          <div style="margin-top:16px;padding:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border);">
+            <div style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:6px;">বট থেকে ব্যবহার (Python):</div>
+            <code style="font-family:'Share Tech Mono';font-size:11px;color:var(--accent3);line-height:1.8;">
+              import requests<br>
+              headers = {"X-Website-Key": "<span id="code-key-preview" style="color:var(--warn);">YOUR_KEY</span>"}<br>
+              r = requests.get("<span id="code-url-preview" style="color:var(--accent);">BASE_URL</span>/api/website/stats", headers=headers)<br>
+              data = r.json()
+            </code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API SECURITY LOG -->
+    <div class="full-panel panel">
+      <div class="panel-header">
+        <span class="panel-title">🔒 API SECURITY LOG</span>
+        <button class="refresh-btn" onclick="loadSecurityLog()">↻ REFRESH</button>
+      </div>
+      <div class="panel-body">
+        <div class="log-scroll" id="security-log">
+          <div class="empty-state">Loading security logs...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API KEYS -->
+    <div class="full-panel panel">
+      <div class="panel-header">
+        <span class="panel-title">🔑 API KEY MANAGEMENT</span>
+        <button class="btn btn-success" onclick="generateKey()" style="padding:6px 16px;font-size:13px;">+ GENERATE</button>
+      </div>
+      <div class="panel-body">
+        <div id="api-keys-list">
+          <div class="empty-state">Loading API keys...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ USER FILES SECTION ══ -->
+    <div id="user-files-section" class="full-panel panel">
+      <div class="panel-header">
+        <span class="panel-title">📁 USER FILES <span id="file-count-badge" style="color:var(--text-dim);font-size:11px;">( 0 ফাইল )</span></span>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim);">
+            <span class="live-dot" style="width:6px;height:6px;"></span>AUTO SAVE ON
+          </span>
+          <button class="refresh-btn" onclick="renderUserFiles()">↻ REFRESH</button>
+          <button class="btn btn-danger" style="padding:4px 12px;font-size:11px;" onclick="clearAllUserFiles()">🗑 CLEAR ALL</button>
+        </div>
+      </div>
+      <div class="panel-body">
+
+        <div class="sync-endpoint-note">
+          📡 বটের /start হ্যান্ডলার থেকে POST করুন: <strong id="sync-ep-display">BASE_URL/api/website/user-sync</strong>
+          &nbsp;·&nbsp; Body: { user_id, name, username, is_vip, is_blocked, shares_today, credits, date }
+          <button class="copy-btn-small" style="margin-left:8px;" onclick="copySyncEndpoint()">COPY URL</button>
+        </div>
+
+        <div class="files-search-bar" style="margin-top:16px;">
+          <input class="files-search-input" id="files-search" type="text" placeholder="নাম বা UID দিয়ে খুঁজুন..." oninput="filterUserFiles()">
+          <button class="files-filter-btn active" id="filter-all" onclick="setFilter('all')">ALL</button>
+          <button class="files-filter-btn vip-filter" id="filter-vip" onclick="setFilter('vip')">👑 VIP</button>
+          <button class="files-filter-btn blocked-filter" id="filter-blocked" onclick="setFilter('blocked')">🚫 BLOCKED</button>
+        </div>
+
+        <div class="user-files-grid" id="user-files-grid">
+          <div class="empty-state" style="grid-column:1/-1;">
+            📂 কোনো ইউজার ফাইল নেই।<br>
+            <span style="font-size:11px;">বট থেকে /api/website/user-sync এ POST করলে ফাইল তৈরি হবে।</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+<div class="modal-overlay" id="modal-broadcast">
+  <div class="modal">
+    <h3>📢 BROADCAST MESSAGE</h3>
+    <textarea id="broadcast-text" rows="4" placeholder="Enter message to send to all users..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="closeModal('modal-broadcast')">CANCEL</button>
+      <button class="btn btn-primary" onclick="sendBroadcast()">SEND TO ALL</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-vip">
+  <div class="modal">
+    <h3 id="vip-modal-title">👑 ADD VIP</h3>
+    <input type="text" id="vip-uid" placeholder="Enter User ID...">
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="closeModal('modal-vip')">CANCEL</button>
+      <button class="btn btn-warn" id="vip-confirm-btn" onclick="confirmVIP()">CONFIRM</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-block">
+  <div class="modal">
+    <h3 id="block-modal-title">🚫 BLOCK USER</h3>
+    <input type="text" id="block-uid" placeholder="Enter User ID...">
+    <div class="modal-btns">
+      <button class="btn btn-danger" onclick="closeModal('modal-block')">CANCEL</button>
+      <button class="btn btn-primary" id="block-confirm-btn" onclick="confirmBlock()">CONFIRM</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOT INJECT MODAL -->
+<div class="modal-overlay" id="modal-bot-inject">
+  <div class="modal" style="width:560px;">
+    <h3>🤖 বটে ডেটা পাঠানো</h3>
+    <p style="color:var(--text-dim);font-size:13px;margin-bottom:16px;font-family:'Share Tech Mono';letter-spacing:1px;line-height:1.7;">
+      এই Website API Key টি বটের কনফিগে সেট করুন।<br>
+      বট নিচের endpoint গুলো থেকে ডেটা টেনে নিতে পারবে।
+    </p>
+    <div style="background:rgba(0,0,0,0.4);border:1px solid var(--border);padding:16px;margin-bottom:16px;">
+      <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);margin-bottom:8px;">WEBSITE API KEY:</div>
+      <div style="font-family:'Share Tech Mono';font-size:13px;color:var(--accent3);word-break:break-all;" id="inject-key-display">—</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.4);border:1px solid var(--border);padding:16px;margin-bottom:16px;">
+      <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);margin-bottom:8px;">BASE URL:</div>
+      <div style="font-family:'Share Tech Mono';font-size:13px;color:var(--accent);word-break:break-all;" id="inject-url-display">—</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.4);border:1px solid var(--border);padding:16px;">
+      <div style="font-family:'Share Tech Mono';font-size:10px;color:var(--text-dim);margin-bottom:6px;">বট config.py তে যোগ করুন:</div>
+      <code style="font-family:'Share Tech Mono';font-size:11px;color:var(--accent3);line-height:2;display:block;" id="inject-code-block">
+        WEBSITE_API_KEY = "..."<br>
+        WEBSITE_BASE_URL = "..."<br>
+        STATS_ENDPOINT = ".../api/website/stats"
+      </code>
+    </div>
+    <div class="modal-btns" style="margin-top:20px;">
+      <button class="btn btn-danger" onclick="closeModal('modal-bot-inject')">CLOSE</button>
+      <button class="btn btn-success" onclick="copyInjectConfig()">📋 CONFIG COPY</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER FILE DETAIL MODAL -->
+<div class="modal-overlay" id="modal-user-file">
+  <div class="modal" style="width:640px;max-height:80vh;overflow-y:auto;">
+    <h3 id="ufile-modal-title">📁 USER FILE</h3>
+
+    <div class="ufile-header">
+      <div class="ufile-avatar" id="ufile-avatar">👤</div>
+      <div class="ufile-meta">
+        <h2 id="ufile-name">—</h2>
+        <div style="font-family:'Share Tech Mono';font-size:11px;color:var(--text-dim);margin-bottom:6px;" id="ufile-id">UID: —</div>
+        <div class="ufile-badges" id="ufile-badges"></div>
+      </div>
+    </div>
+
+    <!-- VIP PROGRESS -->
+    <div class="ufile-progress-section" id="ufile-vip-progress-section">
+      <div class="ufile-progress-label">🎯 VIP PROGRESS</div>
+      <div class="ufile-progress-bar-wrap">
+        <div class="ufile-progress-bar-fill" id="ufile-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="ufile-progress-text" id="ufile-bar-text">0 / 100 ক্রেডিট · VIP হতে আরও 100 বাকি</div>
+    </div>
+
+    <!-- DAILY HISTORY -->
+    <div class="ufile-history-title">📅 প্রতিদিনের হিস্ট্রি</div>
+    <div id="ufile-history-list">
+      <div class="no-history-state">কোনো হিস্ট্রি নেই</div>
+    </div>
+
+    <div class="modal-btns" style="margin-top:20px;">
+      <button class="btn btn-danger" onclick="closeModal('modal-user-file')">CLOSE</button>
+      <button class="btn btn-warn" id="ufile-toggle-vip-btn" onclick="toggleFileVIP()">👑 VIP করুন</button>
+      <button class="btn btn-danger" id="ufile-delete-btn" onclick="deleteCurrentFile()">🗑 DELETE FILE</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════ CONFIG ══════════════
+let API_KEY  = 'BNCT-TF5P916G-ITWQXCR4-EVFRSQIZ-N6ZZ9PRXN1W7BJ46';
+let BASE_URL = 'https://zero000-02-s-h.onrender.com';
+let loginAttempts = 0;
+let lockUntil    = 0;
+
+// ══ WEBSITE API KEY (localStorage এ সেভ, API পরিবর্তনে মোছা যাবে না) ══
+const WEBSITE_KEY_STORAGE = 'bnct_website_api_key';
+
+function getOrCreateWebsiteKey() {
+  let key = localStorage.getItem(WEBSITE_KEY_STORAGE);
+  if (!key) {
+    key = 'WBNCT-' + generateRandomSegment(8) + '-' + generateRandomSegment(8) + '-' + generateRandomSegment(8);
+    localStorage.setItem(WEBSITE_KEY_STORAGE, key);
+  }
+  return key;
+}
+
+function generateRandomSegment(len) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < len; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+function regenerateWebsiteKey() {
+  if (!confirm('Website API Key রিজেনারেট করবেন? পুরনো key আর কাজ করবে না।')) return;
+  const newKey = 'WBNCT-' + generateRandomSegment(8) + '-' + generateRandomSegment(8) + '-' + generateRandomSegment(8);
+  localStorage.setItem(WEBSITE_KEY_STORAGE, newKey);
+  updateWebsiteAPIPanel();
+  showToast('Website API Key রিজেনারেট হয়েছে!', 'success');
+}
+
+function updateWebsiteAPIPanel() {
+  const key = getOrCreateWebsiteKey();
+  const el = document.getElementById('website-api-key');
+  if (el) el.textContent = key;
+
+  // Update endpoints with BASE_URL
+  const base = BASE_URL || 'https://your-bot-api.com';
+  ['ep-stats','ep-users','ep-vip','ep-sync'].forEach(id => {
+    const el2 = document.getElementById(id);
+    if (!el2) return;
+    const path = el2.textContent.replace(/^https?:\/\/[^/]+/, '');
+    el2.textContent = base + path;
+  });
+
+  // Code preview
+  const codeKey = document.getElementById('code-key-preview');
+  const codeUrl = document.getElementById('code-url-preview');
+  if (codeKey) codeKey.textContent = key.slice(0, 16) + '...';
+  if (codeUrl) codeUrl.textContent = base;
+
+  // Inject modal
+  const injKey = document.getElementById('inject-key-display');
+  const injUrl = document.getElementById('inject-url-display');
+  if (injKey) injKey.textContent = key;
+  if (injUrl) injUrl.textContent = base;
+
+  const injCode = document.getElementById('inject-code-block');
+  if (injCode) injCode.innerHTML =
+    `WEBSITE_API_KEY = "${key}"<br>` +
+    `WEBSITE_BASE_URL = "${base}"<br>` +
+    `STATS_ENDPOINT = "${base}/api/website/stats"<br>` +
+    `USERS_ENDPOINT = "${base}/api/website/users"<br>` +
+    `VIP_ENDPOINT = "${base}/api/website/vip-list"<br>` +
+    `SYNC_ENDPOINT = "${base}/api/website/sync"`;
+}
+
+function copyWebsiteKey() {
+  const key = getOrCreateWebsiteKey();
+  copyToClipboard(key, 'Website API Key কপি হয়েছে!');
+}
+
+function copyEndpoint(id) {
+  const el = document.getElementById(id);
+  if (el) copyToClipboard(el.textContent, 'Endpoint কপি হয়েছে!');
+}
+
+function copyInjectConfig() {
+  const key = getOrCreateWebsiteKey();
+  const base = BASE_URL || 'https://your-bot-api.com';
+  const config =
+    `WEBSITE_API_KEY = "${key}"\n` +
+    `WEBSITE_BASE_URL = "${base}"\n` +
+    `STATS_ENDPOINT = "${base}/api/website/stats"\n` +
+    `USERS_ENDPOINT = "${base}/api/website/users"\n` +
+    `VIP_ENDPOINT = "${base}/api/website/vip-list"\n` +
+    `SYNC_ENDPOINT = "${base}/api/website/sync"`;
+  copyToClipboard(config, 'Config কপি হয়েছে!');
+}
+
+function copyToClipboard(text, successMsg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast(successMsg, 'success'))
+      .catch(() => fallbackCopy(text, successMsg));
+  } else {
+    fallbackCopy(text, successMsg);
+  }
+}
+
+function fallbackCopy(text, successMsg) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); showToast(successMsg, 'success'); } catch(e) { showToast('Copy failed', 'error'); }
+  document.body.removeChild(ta);
+}
+
+// ══ PASTE HANDLER (login inputs এ paste সাপোর্ট) ══
+function handlePaste(e, fieldId) {
+  // default paste allow হবে, কিন্তু আমরা নিশ্চিত করব
+  setTimeout(() => {
+    const el = document.getElementById(fieldId);
+    if (el) {
+      // trim whitespace that often gets pasted with URLs/keys
+      el.value = el.value.trim();
+    }
+  }, 10);
+}
+
+// ══ PERSISTENT STATS CACHE (API পরিবর্তনেও ডেটা থাকবে) ══
+const CACHE_KEY = 'bnct_stats_cache';
+
+function saveStatsCache(data) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({
+      ...data,
+      cached_at: Date.now()
+    }));
+  } catch(e) {}
+}
+
+function loadStatsCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return null;
+}
+
+function applyCachedHomeStats() {
+  const cache = loadStatsCache();
+  if (!cache) return false;
+  const ageMin = (Date.now() - (cache.cached_at || 0)) / 60000;
+  // ক্যাশ দিয়ে দেখাও
+  if (cache.total_users !== undefined) {
+    document.getElementById('h-total').textContent = cache.total_users;
+    document.getElementById('h-vip').textContent   = cache.vip_users || 0;
+    document.getElementById('h-blocked').textContent = cache.blocked_users || 0;
+    // যদি API fail হয়ে ক্যাশ ব্যবহার হচ্ছে — CACHED badge দেখাও
+    if (ageMin > 1) {
+      ['h-total-cache','h-vip-cache','h-blocked-cache'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'block';
+      });
+    }
+  }
+  return true;
+}
+
+// ══ Cookie helpers ══
+function setCookie(name, val, days) {
+  const exp = new Date(Date.now() + days*864e5).toUTCString();
+  document.cookie = name + '=' + encodeURIComponent(val) + ';expires=' + exp + ';path=/;SameSite=Lax';
+}
+function getCookie(name) {
+  const cookies = document.cookie.split(";");
+  for (let c of cookies) {
+    const [k, v] = c.trim().split("=");
+    if (k === name) return decodeURIComponent(v || "");
+  }
+  return "";
+}
+
+// ══════════════ SECRET 7-TAP / 7-L LOGIC ══════════════
+let secretTapCount = 0;
+let secretTapTimer = null;
+let secretDelayTimer = null;
+let secretLocked = false;
+
+function handleSecretTap() {
+  if (secretLocked) return;
+  secretTapCount++;
+  if (secretTapCount > 7) {
+    secretTapCount = 0;
+    secretLocked = false;
+    clearTimeout(secretTapTimer);
+    clearTimeout(secretDelayTimer);
+    return;
+  }
+  clearTimeout(secretTapTimer);
+  secretTapTimer = setTimeout(() => {
+    secretTapCount = 0;
+    secretLocked = false;
+  }, 5000);
+  if (secretTapCount === 7) {
+    secretLocked = true;
+    clearTimeout(secretTapTimer);
+    secretDelayTimer = setTimeout(() => {
+      secretTapCount = 0;
+      secretLocked = false;
+      showLoginScreen();
+    }, 7000);
+  }
+}
+
+function showLoginScreen() {
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('login-screen').classList.add('active');
+}
+
+function goBackHome() {
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('secret-zone').style.pointerEvents = 'auto';
+  document.getElementById('login-err').style.display = 'none';
+  document.getElementById('pwd-input').value = '';
+}
+
+// ══════════════ HOME STATS ══════════════
+async function loadHomeStats() {
+  // প্রথমে ক্যাশ দিয়ে দেখাও
+  applyCachedHomeStats();
+
+  if (!BASE_URL) return;
+
+  try {
+    const r = await fetch(BASE_URL + '/api/v1/stats', {
+      headers:{'X-API-Key': API_KEY}
+    });
+    const data = await r.json();
+    if (data.status === 'ok') {
+      const s = data.stats;
+      document.getElementById('h-total').textContent   = s.total_users;
+      document.getElementById('h-vip').textContent     = s.vip_users;
+      document.getElementById('h-blocked').textContent = s.blocked_users;
+      // সফল হলে ক্যাশ badge লুকিয়ে ফেলো
+      ['h-total-cache','h-vip-cache','h-blocked-cache'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      // ডেটা ক্যাশে সেভ করো
+      saveStatsCache({
+        total_users: s.total_users,
+        vip_users: s.vip_users,
+        blocked_users: s.blocked_users
+      });
+    }
+  } catch(e) {
+    // API fail → ক্যাশ দিয়ে চলতে থাকুক (applyCachedHomeStats ইতিমধ্যে চলেছে)
+  }
+
+  try {
+    const rc = await fetch(BASE_URL + '/api/v1/check', {
+      headers:{'X-API-Key': API_KEY}
+    });
+    const dc = await rc.json();
+    const pill = document.getElementById('h-bot-status');
+    if (dc.status === 'ok') {
+      pill.textContent = '🟢 ON';
+      pill.className   = 'bot-status-pill bot-on-pill';
+    } else {
+      pill.textContent = '🔴 OFF';
+      pill.className   = 'bot-status-pill bot-off-pill';
+    }
+  } catch(e) {
+    const pill = document.getElementById('h-bot-status');
+    pill.textContent = '🔴 OFF';
+    pill.className   = 'bot-status-pill bot-off-pill';
+  }
+}
+
+// Auto-refresh home stats every 7s
+loadHomeStats();
+setInterval(loadHomeStats, 7000);
+
+if (!sessionStorage.getItem('bnct_reloaded')) {
+  sessionStorage.setItem('bnct_reloaded', '1');
+  location.reload();
+}
+
+// ══════════════ SECURITY ══════════════
+async function sha256(msg) {
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function sanitize(str) {
+  return String(str).replace(/[<>&"']/g, c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#x27;'}[c]));
+}
+
+function validateUID(uid) {
+  return /^\d{5,15}$/.test(uid.trim());
+}
+
+// ══════════════ LOGIN ══════════════
+async function doLogin() {
+  const now = Date.now();
+  if (lockUntil > now) {
+    showToast(`Locked for ${Math.ceil((lockUntil-now)/1000)}s`, 'error');
+    return;
+  }
+  const pwd    = document.getElementById('pwd-input').value;
+  const apiKey = document.getElementById('api-input').value.trim();
+  const base   = document.getElementById('bot-api').value.trim();
+
+  if (!pwd || !apiKey || !base) {
+    showErr('All fields required');
+    return;
+  }
+  if (!apiKey.startsWith('BNCT-')) {
+    showErr('Invalid API key format');
+    return;
+  }
+
+  const hash = await sha256(pwd);
+  const knownHash = await sha256('19597722591951842878BNCT_100030060');
+  if (hash !== knownHash) {
+    loginAttempts++;
+    if (loginAttempts >= 3) {
+      lockUntil = Date.now() + 30000;
+      showErr('Too many attempts. Locked 30s');
+      updateAttemptsBar();
+      return;
+    }
+    showErr(`Wrong password (${3-loginAttempts} attempts left)`);
+    updateAttemptsBar();
+    return;
+  }
+
+  API_KEY  = apiKey;
+  BASE_URL = base.replace(/\/$/, '');
+
+  try {
+    const r = await apiFetch('/api/v1/check');
+    if (!r || r.status !== 'ok') throw new Error('API check failed');
+  } catch(e) {
+    showErr('API connection failed: ' + e.message);
+    return;
+  }
+
+  // Success
+  document.getElementById('login-screen').classList.remove('active');
+  document.getElementById('home-screen').style.display = 'none';
+  document.getElementById('secret-zone').style.pointerEvents = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('pwd-input').value = '';
+
+  // Website API Panel আপডেট করো
+  updateWebsiteAPIPanel();
+
+  loadAll();
+  setInterval(loadStats, 30000);
+  loadHomeStats();
+}
+
+function showErr(msg) {
+  const el = document.getElementById('login-err');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+}
+
+function updateAttemptsBar() {
+  document.getElementById('attempts-bar').textContent =
+    `Failed attempts: ${loginAttempts}/3`;
+}
+
+function doLogout() {
+  // Logout এ API_KEY / BASE_URL রিসেট হয়, কিন্তু ক্যাশড ডেটা থাকে
+  API_KEY = 'BNCT-TF5P916G-ITWQXCR4-EVFRSQIZ-N6ZZ9PRXN1W7BJ46';
+  BASE_URL = 'https://zero000-02-s-h.onrender.com';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('home-screen').style.display = 'flex';
+  document.getElementById('secret-zone').style.pointerEvents = 'auto';
+  document.getElementById('api-input').value = '';
+  document.getElementById('bot-api').value = '';
+  loadHomeStats();
+}
+
+// ══════════════ API HELPER ══════════════
+async function apiFetch(path, opts = {}) {
+  const url = BASE_URL + path;
+  const headers = {
+    'X-API-Key': API_KEY,
+    'Content-Type': 'application/json',
+    ...( opts.headers || {} )
+  };
+  const res = await fetch(url, { ...opts, headers });
+  return res.json();
+}
+
+// ══════════════ LOAD ALL ══════════════
+function loadAll() {
+  loadStats();
+  loadSecurityLog();
+  loadAPIKeys();
+}
+
+async function loadStats() {
+  document.getElementById('last-refresh').textContent =
+    'Updated: ' + new Date().toLocaleTimeString();
+  try {
+    const r = await apiFetch('/api/v1/stats');
+    if (r.status === 'ok') {
+      document.getElementById('s-total').textContent   = r.stats.total_users;
+      document.getElementById('s-vip').textContent     = r.stats.vip_users;
+      document.getElementById('s-blocked').textContent = r.stats.blocked_users;
+      document.getElementById('s-api-status').textContent = '✅ ON';
+      // Dashboard stats ও ক্যাশে সেভ হোক
+      saveStatsCache({
+        total_users: r.stats.total_users,
+        vip_users: r.stats.vip_users,
+        blocked_users: r.stats.blocked_users
+      });
+    }
+  } catch(e) {
+    document.getElementById('s-api-status').textContent = '❌ OFF';
+  }
+  try {
+    const rc = await apiFetch('/api/v1/check');
+    document.getElementById('s-status').textContent = rc.status === 'ok' ? '🟢 ON' : '🔴 OFF';
+  } catch(e) {
+    document.getElementById('s-status').textContent = '❌ ERR';
+  }
+}
+
+async function loadSecurityLog() {
+  const el = document.getElementById('security-log');
+  try {
+    const r = await apiFetch('/api/v1/security/log');
+    if (!r || !r.logs || !r.logs.length) {
+      el.innerHTML = '<div class="empty-state">No security events found</div>';
+      return;
+    }
+    document.getElementById('s-api').textContent = r.total || '--';
+    el.innerHTML = r.logs.map(log => {
+      const lvl  = log.threat_level || 0;
+      const cls  = lvl===3?'critical':lvl===2?'danger':lvl===1?'warn':'ok';
+      const icon = lvl===3?'🚨':lvl===2?'🔴':lvl===1?'⚠️':'✅';
+      const dt   = new Date(log.timestamp * 1000).toLocaleString();
+      return `<div class="log-entry ${cls}">
+        <span class="log-time">${sanitize(dt)}</span>
+        ${icon} <strong>${sanitize(log.status)}</strong>
+        | 🔑 <code>${sanitize((log.api_key||'').slice(0,20))}...</code>
+        | 🌐 <code>${sanitize(log.ip||'')}</code>
+        | 📍 <code>${sanitize(log.endpoint||'')}</code>
+        ${lvl>0?`<div style="margin-top:4px;color:var(--text-dim)">Payload: ${sanitize((log.payload||'').slice(0,100))}</div>`:''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state">⚠️ Could not load logs (${sanitize(e.message)})</div>`;
+  }
+}
+
+async function loadAPIKeys() {
+  const el = document.getElementById('api-keys-list');
+  try {
+    const r = await apiFetch('/api/v1/api-keys');
+    if (!r || !r.keys || !r.keys.length) {
+      el.innerHTML = '<div class="empty-state">No API keys found</div>';
+      return;
+    }
+    el.innerHTML = `<table class="data-table">
+      <tr><th>KEY</th><th>LABEL</th><th>STATUS</th><th>USES</th><th>LAST USED</th><th>ACTION</th></tr>
+      ${r.keys.map(k=>`<tr>
+        <td><code style="font-size:12px">${sanitize(k.key.slice(0,24))}...</code></td>
+        <td>${sanitize(k.label||'—')}</td>
+        <td><span class="badge ${k.active?'badge-active':'badge-inactive'}">${k.active?'ACTIVE':'INACTIVE'}</span></td>
+        <td>${k.use_count||0}</td>
+        <td style="font-size:12px">${k.last_used?new Date(k.last_used*1000).toLocaleDateString():'Never'}</td>
+        <td><button class="btn btn-danger" style="padding:4px 10px;font-size:12px" onclick="deleteKey('${sanitize(k.key)}')">DELETE</button></td>
+      </tr>`).join('')}
+    </table>`;
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state">⚠️ Could not load keys</div>`;
+  }
+}
+
+// ══════════════ USER LOOKUP ══════════════
+async function lookupUser() {
+  const uid = document.getElementById('uid-input').value.trim();
+  if (!validateUID(uid)) {
+    showToast('Invalid User ID format', 'error');
+    return;
+  }
+  const el = document.getElementById('user-result');
+  el.innerHTML = '<div style="color:var(--text-dim);font-family:\'Share Tech Mono\';font-size:13px">Searching...</div>';
+  try {
+    const r = await apiFetch(`/api/v1/user/${uid}`);
+    if (r.status !== 'ok') {
+      el.innerHTML = `<div style="color:var(--accent2);font-family:'Share Tech Mono';font-size:13px">❌ User not found</div>`;
+      return;
+    }
+    const u = r.user;
+    el.innerHTML = `
+      <div style="background:rgba(0,212,255,0.05);border:1px solid var(--border);padding:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px;">
+          <div><span style="color:var(--text-dim)">ID</span><br><code>${sanitize(u.user_id)}</code></div>
+          <div><span style="color:var(--text-dim)">Name</span><br>${sanitize(u.name||'—')}</div>
+          <div><span style="color:var(--text-dim)">Username</span><br>@${sanitize(u.username||'—')}</div>
+          <div><span style="color:var(--text-dim)">Credits</span><br><code style="color:var(--accent3)">${u.ref_credits||0}</code></div>
+          <div><span style="color:var(--text-dim)">VIP</span><br>
+            <span class="badge ${u.is_vip?'badge-vip':'badge-inactive'}">${u.is_vip?'VIP':'Normal'}</span>
+          </div>
+          <div><span style="color:var(--text-dim)">Status</span><br>
+            <span class="badge ${u.is_blocked?'badge-blocked':'badge-active'}">${u.is_blocked?'BLOCKED':'ACTIVE'}</span>
+          </div>
+        </div>
+      </div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--accent2)">❌ ${sanitize(e.message)}</div>`;
+  }
+}
+
+// ══════════════ BOT CONTROL ══════════════
+async function botControl(action) {
+  try {
+    const r = await apiFetch(`/api/v1/bot/${action}`, {method:'POST'});
+    if (r.status === 'ok') {
+      showToast(`Bot ${action.toUpperCase()} successful`, 'success');
+      loadStats();
+    } else {
+      showToast('Action failed: ' + (r.message||''), 'error');
+    }
+  } catch(e) {
+    showToast('Connection error', 'error');
+  }
+}
+
+// ══════════════ VIP ══════════════
+let vipAction = 'add';
+function openAddVIP()    { vipAction='add';    document.getElementById('vip-modal-title').textContent='👑 ADD VIP';    document.getElementById('vip-uid').value=''; openModal('modal-vip'); }
+function openRemoveVIP() { vipAction='remove'; document.getElementById('vip-modal-title').textContent='❌ REMOVE VIP'; document.getElementById('vip-uid').value=''; openModal('modal-vip'); }
+
+async function confirmVIP() {
+  const uid = document.getElementById('vip-uid').value.trim();
+  if (!validateUID(uid)) { showToast('Invalid UID', 'error'); return; }
+  try {
+    const r = await apiFetch(`/api/v1/vip/${vipAction}`, {method:'POST', body:JSON.stringify({uid:parseInt(uid)})});
+    if (r.status === 'ok') {
+      showToast(`VIP ${vipAction} successful for UID: ${uid}`, 'success');
+      closeModal('modal-vip');
+    } else {
+      showToast(r.message || 'Failed', 'error');
+    }
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ══════════════ BLOCK ══════════════
+let blockAction = 'block';
+function openBlockUser()   { blockAction='block';   document.getElementById('block-modal-title').textContent='🚫 BLOCK USER';   document.getElementById('block-uid').value=''; openModal('modal-block'); }
+function openUnblockUser() { blockAction='unblock'; document.getElementById('block-modal-title').textContent='✅ UNBLOCK USER'; document.getElementById('block-uid').value=''; openModal('modal-block'); }
+
+async function confirmBlock() {
+  const uid = document.getElementById('block-uid').value.trim();
+  if (!validateUID(uid)) { showToast('Invalid UID', 'error'); return; }
+  try {
+    const r = await apiFetch(`/api/v1/user/${blockAction}`, {method:'POST', body:JSON.stringify({uid:parseInt(uid)})});
+    if (r.status === 'ok') {
+      showToast(`User ${blockAction}ed: ${uid}`, 'success');
+      closeModal('modal-block');
+      loadStats();
+    } else {
+      showToast(r.message || 'Failed', 'error');
+    }
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ══════════════ BROADCAST ══════════════
+function openBroadcast() { openModal('modal-broadcast'); }
+
+async function sendBroadcast() {
+  const text = document.getElementById('broadcast-text').value.trim();
+  if (!text) { showToast('Message cannot be empty', 'error'); return; }
+  try {
+    const r = await apiFetch('/api/v1/broadcast', {method:'POST', body:JSON.stringify({message:text})});
+    if (r.status === 'ok') {
+      showToast(`Broadcast sent to ${r.sent||'all'} users`, 'success');
+      closeModal('modal-broadcast');
+      document.getElementById('broadcast-text').value = '';
+    } else {
+      showToast(r.message || 'Failed', 'error');
+    }
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ══════════════ API KEYS ══════════════
+async function generateKey() {
+  const label = prompt('Enter a label for this API key (optional):') || '';
+  try {
+    const r = await apiFetch('/api/v1/api-keys/generate', {method:'POST', body:JSON.stringify({label})});
+    if (r.status === 'ok') {
+      showToast('API Key generated!', 'success');
+      alert(`New API Key:\n\n${r.key}\n\nSave this key securely!`);
+      loadAPIKeys();
+    } else {
+      showToast(r.message || 'Failed', 'error');
+    }
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function deleteKey(key) {
+  if (!confirm(`Delete API key?\n${key.slice(0,30)}...`)) return;
+  try {
+    const r = await apiFetch('/api/v1/api-keys/delete', {method:'POST', body:JSON.stringify({key})});
+    if (r.status === 'ok') {
+      showToast('API Key deleted', 'success');
+      loadAPIKeys();
+    }
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ══════════════ MODAL HELPERS ══════════════
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ══════════════ TOAST ══════════════
+function showToast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = `show ${type}`;
+  setTimeout(() => { t.className = type; }, 3000);
+}
+
+// ══════════════ USER FILES SYSTEM ══════════════
+// localStorage এ সেভ হবে — বট আপডেট হলেও ডেটা থাকবে
+const USER_FILES_KEY = 'bnct_user_files_v2';
+const VIP_CREDIT_THRESHOLD = 100; // কতো ক্রেডিটে VIP
+let currentFilter = 'all';
+let currentFileUID = null;
+
+// ── সব ইউজার ফাইল লোড করো
+function getAllUserFiles() {
+  try {
+    const raw = localStorage.getItem(USER_FILES_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {};
+}
+
+// ── সেভ করো
+function saveAllUserFiles(files) {
+  try {
+    localStorage.setItem(USER_FILES_KEY, JSON.stringify(files));
+  } catch(e) {
+    showToast('Storage full! পুরনো ফাইল মুছুন।', 'error');
+  }
+}
+
+// ── বট থেকে আসা ডেটা প্রসেস করো (API endpoint simulation)
+// বট এই ফাংশন কল করবে POST /api/website/user-sync দিয়ে
+// কিন্তু যেহেতু এটা static HTML, আমরা custom event দিয়ে handle করব
+// Bot Integration: বট JSONP বা Beacon API দিয়ে POST করবে
+function processUserSync(payload) {
+  /*
+   payload = {
+     user_id: "123456789",
+     name: "BNCT",
+     username: "bnct_user",
+     is_vip: false,
+     is_blocked: false,
+     shares_today: 5,
+     credits: 23,
+     date: "2024-01-15"  // optional, default আজকের তারিখ
+   }
+  */
+  if (!payload || !payload.user_id) return;
+
+  const files = getAllUserFiles();
+  const uid = String(payload.user_id);
+  const today = payload.date || new Date().toISOString().split('T')[0];
+
+  if (!files[uid]) {
+    // নতুন ফাইল তৈরি
+    files[uid] = {
+      uid: uid,
+      name: payload.name || 'Unknown',
+      username: payload.username || '',
+      is_vip: payload.is_vip || false,
+      is_blocked: payload.is_blocked || false,
+      total_credits: payload.credits || 0,
+      total_shares: payload.shares_today || 0,
+      first_seen: today,
+      last_seen: today,
+      is_new: true,
+      history: {}
+    };
+  } else {
+    // আপডেট করো
+    files[uid].name = payload.name || files[uid].name;
+    files[uid].username = payload.username || files[uid].username;
+    files[uid].is_vip = payload.is_vip !== undefined ? payload.is_vip : files[uid].is_vip;
+    files[uid].is_blocked = payload.is_blocked !== undefined ? payload.is_blocked : files[uid].is_blocked;
+    files[uid].last_seen = today;
+    files[uid].is_new = false;
+
+    // ক্রেডিট আপডেট (না কমিয়ে, সর্বোচ্চ রাখো)
+    if (payload.credits !== undefined) {
+      files[uid].total_credits = Math.max(files[uid].total_credits || 0, payload.credits);
+    }
+  }
+
+  // আজকের হিস্ট্রি সেট করো
+  if (!files[uid].history) files[uid].history = {};
+  if (!files[uid].history[today]) {
+    files[uid].history[today] = {
+      date: today,
+      shares: 0,
+      credits: 0
+    };
+  }
+  if (payload.shares_today !== undefined) {
+    files[uid].history[today].shares = payload.shares_today;
+  }
+  if (payload.credits !== undefined) {
+    files[uid].history[today].credits = payload.credits;
+  }
+
+  // total shares আপডেট
+  files[uid].total_shares = Object.values(files[uid].history).reduce((s, d) => s + (d.shares || 0), 0);
+
+  saveAllUserFiles(files);
+  renderUserFiles();
+  updateHomeUserCount();
+  return { status: 'ok', uid, name: files[uid].name };
+}
+
+// ── ফাইলগুলো রেন্ডার করো
+function renderUserFiles() {
+  const files = getAllUserFiles();
+  const grid = document.getElementById('user-files-grid');
+  const count = Object.keys(files).length;
+
+  // badge update
+  const badge = document.getElementById('file-count-badge');
+  if (badge) badge.textContent = `( ${count} ফাইল )`;
+
+  if (count === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      📂 কোনো ইউজার ফাইল নেই।<br>
+      <span style="font-size:11px;">বট থেকে /api/website/user-sync এ POST করলে ফাইল তৈরি হবে।</span>
+    </div>`;
+    return;
+  }
+
+  const search = (document.getElementById('files-search') || {value: ''}).value.toLowerCase();
+
+  const filtered = Object.values(files).filter(f => {
+    if (currentFilter === 'vip' && !f.is_vip) return false;
+    if (currentFilter === 'blocked' && !f.is_blocked) return false;
+    if (search) {
+      return (f.name || '').toLowerCase().includes(search) ||
+             (f.username || '').toLowerCase().includes(search) ||
+             (f.uid || '').includes(search);
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">🔍 কোনো ফলাফল নেই</div>`;
+    return;
+  }
+
+  // সর্বশেষ seen দিয়ে sort
+  filtered.sort((a, b) => (b.last_seen || '').localeCompare(a.last_seen || ''));
+
+  grid.innerHTML = filtered.map(f => {
+    let roleClass = 'file-normal';
+    let roleIcon  = '📄';
+    if (f.is_vip && !f.is_blocked)    { roleClass = 'file-vip';     roleIcon = '📁'; }
+    if (f.is_blocked)                  { roleClass = 'file-blocked';  roleIcon = '📁'; }
+
+    const todayKey = new Date().toISOString().split('T')[0];
+    const todayData = (f.history || {})[todayKey] || {};
+    const progress = Math.min(100, Math.round(((f.total_credits || 0) / VIP_CREDIT_THRESHOLD) * 100));
+
+    return `
+    <div class="user-file-card ${roleClass}" onclick="openUserFile('${f.uid}')">
+      ${f.is_new ? '<div class="file-new-dot"></div>' : ''}
+      <div class="file-folder-top"></div>
+      <div class="file-folder-body">
+        <div>
+          <div class="file-name">${sanitize(f.name || 'Unknown')}</div>
+          <div class="file-uid-tag">UID: ${sanitize(f.uid)}</div>
+        </div>
+        <div class="file-stats-mini">
+          <div class="file-stat-row">
+            <span>📤 শেয়ার</span>
+            <span>${todayData.shares || 0}</span>
+          </div>
+          <div class="file-stat-row">
+            <span>💎 ক্রেডিট</span>
+            <span>${f.total_credits || 0}</span>
+          </div>
+          <div class="file-stat-row">
+            <span>📊 VIP</span>
+            <span>${progress}%</span>
+          </div>
+        </div>
+        <div class="file-last-seen">🕐 ${sanitize(f.last_seen || '—')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── ফাইল ডিটেইল খুলুন
+function openUserFile(uid) {
+  const files = getAllUserFiles();
+  const f = files[uid];
+  if (!f) return;
+
+  currentFileUID = uid;
+
+  // is_new মুছো
+  f.is_new = false;
+  saveAllUserFiles(files);
+
+  // Modal populate
+  const roleLabel = f.is_vip ? 'VIP' : f.is_blocked ? 'BLOCKED' : 'NORMAL';
+  document.getElementById('ufile-modal-title').textContent = `📁 ${f.name || 'Unknown'}`;
+  document.getElementById('ufile-name').textContent = f.name || 'Unknown';
+  document.getElementById('ufile-id').textContent = `UID: ${f.uid}${f.username ? ' · @' + f.username : ''}`;
+
+  // Avatar
+  const av = document.getElementById('ufile-avatar');
+  av.textContent = f.is_vip ? '👑' : f.is_blocked ? '🚫' : '👤';
+  av.className = `ufile-avatar ${f.is_vip ? 'vip' : f.is_blocked ? 'blocked' : 'normal'}`;
+
+  // Badges
+  const badges = document.getElementById('ufile-badges');
+  badges.innerHTML = '';
+  if (f.is_vip) badges.innerHTML += '<span class="badge badge-vip">VIP</span> ';
+  if (f.is_blocked) badges.innerHTML += '<span class="badge badge-inactive">BLOCKED</span> ';
+  if (!f.is_vip && !f.is_blocked) badges.innerHTML += '<span class="badge badge-active">NORMAL</span>';
+
+  // VIP Progress
+  const credits = f.total_credits || 0;
+  const progress = Math.min(100, Math.round((credits / VIP_CREDIT_THRESHOLD) * 100));
+  const remaining = Math.max(0, VIP_CREDIT_THRESHOLD - credits);
+  document.getElementById('ufile-bar-fill').style.width = progress + '%';
+  document.getElementById('ufile-bar-text').textContent =
+    f.is_vip
+      ? '✅ ইতিমধ্যে VIP সদস্য'
+      : `${credits} / ${VIP_CREDIT_THRESHOLD} ক্রেডিট · VIP হতে আরও ${remaining} বাকি`;
+
+  // VIP toggle btn text
+  const vipBtn = document.getElementById('ufile-toggle-vip-btn');
+  vipBtn.textContent = f.is_vip ? '❌ VIP সরান' : '👑 VIP করুন';
+  vipBtn.className = f.is_vip ? 'btn btn-danger' : 'btn btn-warn';
+
+  // History
+  const histEl = document.getElementById('ufile-history-list');
+  const history = f.history || {};
+  const days = Object.keys(history).sort((a, b) => b.localeCompare(a));
+
+  if (days.length === 0) {
+    histEl.innerHTML = '<div class="no-history-state">📅 কোনো হিস্ট্রি নেই</div>';
+  } else {
+    histEl.innerHTML = days.map(dateKey => {
+      const d = history[dateKey];
+      const [yr, mo, dy] = dateKey.split('-');
+      const monthNames = ['জানু', 'ফেব্রু', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টে', 'অক্টো', 'নভে', 'ডিসে'];
+      const moName = monthNames[parseInt(mo, 10) - 1] || mo;
+      const isVipDay = (d.credits || 0) >= VIP_CREDIT_THRESHOLD;
+
+      return `
+      <div class="history-day-card ${isVipDay ? 'vip-day' : ''}">
+        <div class="history-date-row">📅 ${dy} ${moName} ${yr}</div>
+        <div class="history-stats-row">
+          <div class="history-stat-item">
+            <span class="hsi-val">${d.shares || 0}</span>
+            <span class="hsi-label">📤 শেয়ার</span>
+          </div>
+          <div class="history-stat-item">
+            <span class="hsi-val" style="color:var(--warn)">${d.credits || 0}</span>
+            <span class="hsi-label">💎 ক্রেডিট</span>
+          </div>
+          <div class="history-stat-item">
+            <span class="hsi-val" style="color:${isVipDay ? 'var(--warn)' : 'var(--text-dim)'}">${isVipDay ? '👑' : '—'}</span>
+            <span class="hsi-label">VIP দিন</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  openModal('modal-user-file');
+}
+
+// ── VIP toggle from modal
+function toggleFileVIP() {
+  if (!currentFileUID) return;
+  const files = getAllUserFiles();
+  const f = files[currentFileUID];
+  if (!f) return;
+  f.is_vip = !f.is_vip;
+  saveAllUserFiles(files);
+  openUserFile(currentFileUID); // re-render modal
+  renderUserFiles();
+  showToast(f.is_vip ? `${f.name} কে VIP করা হয়েছে 👑` : `${f.name} এর VIP সরানো হয়েছে`, f.is_vip ? 'success' : 'info');
+}
+
+// ── File delete from modal
+function deleteCurrentFile() {
+  if (!currentFileUID) return;
+  const files = getAllUserFiles();
+  const name = (files[currentFileUID] || {}).name || currentFileUID;
+  if (!confirm(`"${name}" এর ফাইল মুছবেন? এই ডেটা ফিরে পাওয়া যাবে না।`)) return;
+  delete files[currentFileUID];
+  saveAllUserFiles(files);
+  closeModal('modal-user-file');
+  currentFileUID = null;
+  renderUserFiles();
+  updateHomeUserCount();
+  showToast('ফাইল মুছে গেছে', 'success');
+}
+
+// ── Clear all
+function clearAllUserFiles() {
+  if (!confirm('সব ইউজার ফাইল মুছবেন? এই ডেটা ফিরে পাওয়া যাবে না।')) return;
+  localStorage.removeItem(USER_FILES_KEY);
+  renderUserFiles();
+  updateHomeUserCount();
+  showToast('সব ফাইল মুছে গেছে', 'success');
+}
+
+// ── Filter
+function setFilter(f) {
+  currentFilter = f;
+  ['all','vip','blocked'].forEach(id => {
+    const btn = document.getElementById(`filter-${id}`);
+    if (btn) btn.classList.toggle('active', id === f);
+  });
+  renderUserFiles();
+}
+
+function filterUserFiles() {
+  renderUserFiles();
+}
+
+// ── Home screen user count = file count
+function updateHomeUserCount() {
+  const files = getAllUserFiles();
+  const count = Object.keys(files).length;
+  // Home screen update
+  const hTotal = document.getElementById('h-total');
+  if (hTotal) {
+    // শুধু তখনই override করো যদি API ডেটা না আসে (0 বা --)
+    const currentVal = hTotal.textContent;
+    if (currentVal === '--' || currentVal === '0') {
+      hTotal.textContent = count;
+    }
+  }
+  const note = document.getElementById('home-file-count-note');
+  if (note) note.textContent = `📁 ${count} ফাইল সেভ আছে`;
+}
+
+// ── Sync endpoint display update
+function updateSyncEndpointDisplay() {
+  const ep = document.getElementById('sync-ep-display');
+  if (ep) ep.textContent = (BASE_URL || 'BASE_URL') + '/api/website/user-sync';
+}
+
+function copySyncEndpoint() {
+  const url = (BASE_URL || '') + '/api/website/user-sync';
+  copyToClipboard(url, 'Sync URL কপি হয়েছে!');
+}
+
+// ══ BOT DATA RECEIVER — বট এই endpoint এ POST করবে ══
+// যেহেতু এটা static HTML, বট CORS দিয়ে সরাসরি POST করতে পারবে না
+// তাই বট তার নিজের server থেকে এই website এর localStorage কে
+// "push" করার জন্য URL parameter বা localStorage bridge ব্যবহার করবে
+
+// URL Parameter থেকে user sync (বট redirect করে পাঠাতে পারে)
+function checkURLParamsForSync() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const syncData = params.get('user_sync');
+    if (syncData) {
+      const payload = JSON.parse(atob(syncData));
+      const result = processUserSync(payload);
+      if (result && result.status === 'ok') {
+        showToast(`✅ ${result.name} এর ডেটা সেভ হয়েছে`, 'success');
+      }
+      // URL পরিষ্কার করো
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  } catch(e) {}
+}
+
+// localStorage Bridge — বট অন্য একটি tab বা iframe দিয়ে push করতে পারে
+window.addEventListener('storage', function(e) {
+  if (e.key === 'bnct_bot_push') {
+    try {
+      const payload = JSON.parse(e.newValue);
+      if (payload) {
+        processUserSync(payload);
+        showToast(`📡 বট থেকে ডেটা এসেছে: ${payload.name || payload.user_id}`, 'success');
+        localStorage.removeItem('bnct_bot_push');
+      }
+    } catch(err) {}
+  }
+});
+
+// PostMessage Bridge — iframe বা bot webview দিয়ে push
+window.addEventListener('message', function(e) {
+  try {
+    const msg = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+    if (msg && msg.type === 'bnct_user_sync') {
+      const result = processUserSync(msg.payload);
+      if (result) showToast(`📡 ${result.name} এর ডেটা সেভ হয়েছে`, 'success');
+    }
+  } catch(err) {}
+});
+
+// ── Demo: বট API থেকে ইউজার লিস্ট টেনে ফাইল তৈরি করো
+async function syncUsersFromBotAPI() {
+  if (!BASE_URL || !API_KEY) return;
+  try {
+    const r = await apiFetch('/api/v1/users');
+    if (!r || !r.users) return;
+    let count = 0;
+    for (const u of r.users) {
+      processUserSync({
+        user_id: u.user_id,
+        name: u.name || u.first_name || 'User',
+        username: u.username || '',
+        is_vip: u.is_vip || false,
+        is_blocked: u.is_blocked || false,
+        credits: u.ref_credits || 0,
+        shares_today: 0
+      });
+      count++;
+    }
+    if (count > 0) showToast(`✅ ${count} জন ইউজারের ফাইল সিঙ্ক হয়েছে`, 'success');
+  } catch(e) {
+    // API তে /users endpoint নাও থাকতে পারে, skip
+  }
+}
+
+// ══ PYTHON BOT CODE HELPER ══
+function showBotSyncCode() {
+  const key = getOrCreateWebsiteKey();
+  const base = BASE_URL || 'https://your-site.com';
+  const code = `# বটের /start handler এ এই কোড যোগ করুন:
+import requests, datetime
+
+WEBSITE_KEY = "${key}"
+WEBSITE_URL = "${base}"
+
+async def sync_user_to_website(user):
+    today = datetime.date.today().isoformat()
+    payload = {
+        "user_id": str(user.id),
+        "name": user.full_name,
+        "username": user.username or "",
+        "is_vip": await db.is_vip(user.id),
+        "is_blocked": await db.is_blocked(user.id),
+        "shares_today": await db.get_shares_today(user.id),
+        "credits": await db.get_credits(user.id),
+        "date": today
+    }
+    try:
+        r = requests.post(
+            f"{WEBSITE_URL}/api/website/user-sync",
+            json=payload,
+            headers={"X-Website-Key": WEBSITE_KEY},
+            timeout=5
+        )
+    except: pass  # website offline হলে skip
+
+# /start handler এ:
+@dp.message_handler(commands=['start'])
+async def start_handler(msg):
+    await sync_user_to_website(msg.from_user)
+    # ... বাকি কোড`;
+  alert(code);
+}
+
+// ══ INIT ══
+// Dashboard খোলার সময় files render করো
+const _origLoadAll = loadAll;
+function loadAll() {
+  _origLoadAll();
+  renderUserFiles();
+  updateSyncEndpointDisplay();
+  setTimeout(syncUsersFromBotAPI, 2000); // বট API থেকে auto-sync
+}
+
+// Home screen এ file count দেখাও
+function updateHomeFileNote() {
+  // Home footer এ file count badge যোগ করো
+  const footer = document.querySelector('.home-footer');
+  if (footer && !document.getElementById('home-file-count-note')) {
+    const noteEl = document.createElement('div');
+    noteEl.id = 'home-file-count-note';
+    noteEl.className = 'home-file-count-note';
+    footer.after(noteEl);
+  }
+  updateHomeUserCount();
+}
+
+// Init
+checkURLParamsForSync();
+updateHomeFileNote();
+renderUserFiles();
+
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('login-screen').classList.contains('active')) doLogin();
+    if (document.getElementById('uid-input') === document.activeElement) lookupUser();
+  }
+  if (e.key === 'Escape') {
+    ['modal-broadcast','modal-vip','modal-block','modal-bot-inject'].forEach(closeModal);
+  }
+  if (e.key === 'l' || e.key === 'L') {
+    handleSecretTap();
+  }
+});
+
+// ══════════════ INIT ══════════════
+window.addEventListener('DOMContentLoaded', function() {
+  const savedKey = getCookie('bnct_api_key');
+  const savedUrl = getCookie('bnct_api_url');
+  if (savedKey && savedKey.startsWith('BNCT-')) API_KEY  = savedKey;
+  if (savedUrl && savedUrl.startsWith('http'))  BASE_URL = savedUrl.replace(/\/$/, '');
+
+  // হোম পেজে ক্যাশড ডেটা সাথে সাথে দেখাও
+  applyCachedHomeStats();
+});
+</script>
+</body>
+</html>
